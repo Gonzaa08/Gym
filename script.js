@@ -1,21 +1,21 @@
 // CONFIGURACIÓN DE API
-const API_URL = 'api/';
+const API_URL = "api/";
 
 // Helper para hacer peticiones fetch
 async function apiRequest(endpoint, options = {}) {
     try {
         const response = await fetch(API_URL + endpoint, {
             headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
+                "Content-Type": "application/json",
+                ...options.headers,
             },
-            ...options
+            ...options,
         });
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error('Error en la petición:', error);
-        return { success: false, message: 'Error de conexión' };
+        console.error("Error en la petición:", error);
+        return { success: false, message: "Error de conexión" };
     }
 }
 
@@ -26,7 +26,7 @@ let cache = {
     instructores: null,
     clases: null,
     clasesGym: null,
-    lastUpdate: null
+    lastUpdate: null,
 };
 
 // ============================================
@@ -38,13 +38,18 @@ function formatCurrency(amount) {
 }
 
 function formatDate(dateString) {
-    if (!dateString) return '-';
+    if (!dateString) return "-";
     const date = new Date(dateString + "T00:00:00");
     return date.toLocaleDateString("es-AR");
 }
 
 function getCurrentDate() {
-    const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+    const options = {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    };
     return new Date().toLocaleDateString("es-AR", options);
 }
 
@@ -171,8 +176,14 @@ const permisosPorRol = {
         pagos: { ver: true, crear: true, editar: true, eliminar: true },
         asistencias: { ver: true, registrar: true },
         planes: { ver: true, crear: true, editar: true, eliminar: true },
-        clases: { ver: true, crear: true, editar: true, eliminar: true, asignarInstructor: true },
-        reportes: { ver: true, exportar: true }
+        clases: {
+            ver: true,
+            crear: true,
+            editar: true,
+            eliminar: true,
+            asignarInstructor: true,
+        },
+        reportes: { ver: true, exportar: true },
     },
     Recepcionista: {
         socios: { ver: true, crear: true, editar: true, eliminar: false },
@@ -180,8 +191,14 @@ const permisosPorRol = {
         pagos: { ver: true, crear: true, editar: false, eliminar: false },
         asistencias: { ver: true, registrar: true },
         planes: { ver: true, crear: false, editar: false, eliminar: false },
-        clases: { ver: true, crear: false, editar: false, eliminar: false, asignarInstructor: false },
-        reportes: { ver: true, exportar: false }
+        clases: {
+            ver: true,
+            crear: false,
+            editar: false,
+            eliminar: false,
+            asignarInstructor: false,
+        },
+        reportes: { ver: true, exportar: false },
     },
     Instructor: {
         socios: { ver: false, crear: false, editar: false, eliminar: false },
@@ -189,8 +206,14 @@ const permisosPorRol = {
         pagos: { ver: false, crear: false, editar: false, eliminar: false },
         asistencias: { ver: false, registrar: false },
         planes: { ver: false, crear: false, editar: false, eliminar: false },
-        clases: { ver: true, crear: false, editar: false, eliminar: false, asignarInstructor: false },
-        reportes: { ver: false, exportar: false }
+        clases: {
+            ver: true,
+            crear: false,
+            editar: false,
+            eliminar: false,
+            asignarInstructor: false,
+        },
+        reportes: { ver: false, exportar: false },
     },
     Socio: {
         socios: { ver: false, crear: false, editar: false, eliminar: false },
@@ -198,9 +221,15 @@ const permisosPorRol = {
         pagos: { ver: false, crear: false, editar: false, eliminar: false },
         asistencias: { ver: false, registrar: false },
         planes: { ver: true, crear: false, editar: false, eliminar: false },
-        clases: { ver: true, crear: false, editar: false, eliminar: false, asignarInstructor: false },
-        reportes: { ver: false, exportar: false }
-    }
+        clases: {
+            ver: true,
+            crear: false,
+            editar: false,
+            eliminar: false,
+            asignarInstructor: false,
+        },
+        reportes: { ver: false, exportar: false },
+    },
 };
 // ============================================
 // FUNCIONES PRINCIPALES DE PERMISOS
@@ -1127,7 +1156,7 @@ function initLogin() {
         try {
             const response = await apiRequest(
                 `usuarios.php?action=login&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`,
-                { method: 'GET' }
+                { method: "GET" },
             );
 
             if (response.success) {
@@ -1138,7 +1167,7 @@ function initLogin() {
                 errorDiv.style.display = "flex";
             }
         } catch (error) {
-            console.error('Error en login:', error);
+            console.error("Error en login:", error);
             errorDiv.style.display = "flex";
         }
     });
@@ -1163,11 +1192,12 @@ function logout() {
 
 function initMainSystem() {
     document.getElementById("userRole").textContent = currentUser.rol;
-    document.getElementById("welcomeText").textContent = `Bienvenido, ${currentUser.nombre}`;
+    document.getElementById("welcomeText").textContent =
+        `Bienvenido, ${currentUser.nombre}`;
     document.getElementById("currentDate").textContent = getCurrentDate();
-    
+
     generateMenu();
-    
+
     initDashboard();
     initUsuariosModule();
     initSociosModule();
@@ -1175,10 +1205,12 @@ function initMainSystem() {
     initPagosModule();
     initPlanesModule();
     initClasesInstructoresModule();
-    
+
     document.getElementById("logoutBtn").addEventListener("click", logout);
-    document.getElementById("toggleSidebar").addEventListener("click", toggleSidebar);
-    
+    document
+        .getElementById("toggleSidebar")
+        .addEventListener("click", toggleSidebar);
+
     if (currentUser.rol === "Socio") {
         showModule("miPlan");
     } else {
@@ -1191,22 +1223,73 @@ function generateMenu() {
     nav.innerHTML = "";
 
     const menuItems = [
-        { id: "dashboard", label: "Dashboard", icon: "fa-chart-line", roles: ["Administrador", "Recepcionista"] },
-        { id: "usuarios", label: "Usuarios", icon: "fa-users-cog", roles: ["Administrador"] },
-        { id: "socios", label: "Socios", icon: "fa-users", roles: ["Administrador", "Recepcionista"] },
-        { id: "asistencias", label: "Asistencias", icon: "fa-calendar-check", roles: ["Recepcionista"] },
-        { id: "pagos", label: "Pagos", icon: "fa-dollar-sign", roles: ["Administrador", "Recepcionista"] },
-        { id: "planes", label: "Planes", icon: "fa-file-alt", roles: ["Administrador", "Recepcionista"] },
-        { id: "clasesInstructores", label: "Clases", icon: "fa-chalkboard-teacher", roles: ["Administrador"] },
-        { id: "perfil", label: "Mi Perfil", icon: "fa-user-circle", roles: ["Socio"] },
-        { id: "miPlan", label: "Mi Plan", icon: "fa-id-card", roles: ["Socio"] }
+        {
+            id: "dashboard",
+            label: "Dashboard",
+            icon: "fa-chart-line",
+            roles: ["Administrador", "Recepcionista"],
+        },
+        {
+            id: "usuarios",
+            label: "Usuarios",
+            icon: "fa-users-cog",
+            roles: ["Administrador"],
+        },
+        {
+            id: "socios",
+            label: "Socios",
+            icon: "fa-users",
+            roles: ["Administrador", "Recepcionista"],
+        },
+        {
+            id: "asistencias",
+            label: "Asistencias",
+            icon: "fa-calendar-check",
+            roles: ["Recepcionista"],
+        },
+        {
+            id: "pagos",
+            label: "Pagos",
+            icon: "fa-dollar-sign",
+            roles: ["Administrador", "Recepcionista"],
+        },
+        {
+            id: "planes",
+            label: "Planes",
+            icon: "fa-file-alt",
+            roles: ["Administrador", "Recepcionista"],
+        },
+        {
+            id: "clasesInstructores",
+            label: "Clases",
+            icon: "fa-chalkboard-teacher",
+            roles: ["Administrador"],
+        },
+        {
+            id: "reportes",
+            label: "Reportes",
+            icon: "fa-chart-bar",
+            roles: ["Administrador"],
+        },
+        {
+            id: "perfil",
+            label: "Mi Perfil",
+            icon: "fa-user-circle",
+            roles: ["Socio"],
+        },
+        {
+            id: "miPlan",
+            label: "Mi Plan",
+            icon: "fa-id-card",
+            roles: ["Socio"],
+        },
     ];
 
     if (!currentUser) return;
 
     menuItems
-        .filter(item => item.roles.includes(currentUser.rol))
-        .forEach(item => {
+        .filter((item) => item.roles.includes(currentUser.rol))
+        .forEach((item) => {
             const button = document.createElement("button");
             button.className = "nav-item";
             button.innerHTML = `<i class="fas ${item.icon}"></i><span>${item.label}</span>`;
@@ -1216,32 +1299,47 @@ function generateMenu() {
 }
 
 function showModule(moduleName, event) {
-    document.querySelectorAll(".module").forEach(module => {
+    document.querySelectorAll(".module").forEach((module) => {
         module.style.display = "none";
     });
-    
+
     document.getElementById(moduleName + "Module").style.display = "block";
-    
-    document.querySelectorAll(".nav-item").forEach(item => {
+
+    document.querySelectorAll(".nav-item").forEach((item) => {
         item.classList.remove("active");
     });
-    
+
     if (event && event.target) {
         event.target.closest(".nav-item").classList.add("active");
     }
-    
+
     activeModule = moduleName;
 
     switch (moduleName) {
-        case "dashboard": updateDashboard(); break;
-        case "usuarios": updateUsuariosTable(); break;
-        case "socios": updateSociosTable(); break;
-        case "asistencias": updateAsistenciasTable(); break;
-        case "pagos": updatePagosTable(); break;
-        case "planes": updatePlanesGrid(); break;
-        case "clasesInstructores": 
+        case "dashboard":
+            updateDashboard();
+            break;
+        case "usuarios":
+            updateUsuariosTable();
+            break;
+        case "socios":
+            updateSociosTable();
+            break;
+        case "asistencias":
+            updateAsistenciasTable();
+            break;
+        case "pagos":
+            updatePagosTable();
+            break;
+        case "planes":
+            updatePlanesGrid();
+            break;
+        case "clasesInstructores":
             updateClasesTable();
             updateInstructoresGrid();
+            break;
+        case "reportes":
+            initReportesModule();
             break;
     }
 }
@@ -1249,7 +1347,6 @@ function showModule(moduleName, event) {
 function toggleSidebar() {
     document.getElementById("sidebar").classList.toggle("collapsed");
 }
-
 
 // ============================================
 // MÓDULO DASHBOARD
@@ -1303,36 +1400,51 @@ function obtenerSociosProximosVencer(dias = 7) {
 
 async function updateDashboard() {
     try {
-        const sociosResponse = await apiRequest('socios.php?action=stats', { method: 'GET' });
+        const sociosResponse = await apiRequest("socios.php?action=stats", {
+            method: "GET",
+        });
         if (sociosResponse.success) {
-            document.getElementById("sociosActivos").textContent = sociosResponse.data.activos;
-            document.getElementById("sociosMorosos").textContent = sociosResponse.data.morosos;
+            document.getElementById("sociosActivos").textContent =
+                sociosResponse.data.activos;
+            document.getElementById("sociosMorosos").textContent =
+                sociosResponse.data.morosos;
         }
 
-        const asistenciasResponse = await apiRequest('asistencias.php?action=stats', { method: 'GET' });
+        const asistenciasResponse = await apiRequest(
+            "asistencias.php?action=stats",
+            { method: "GET" },
+        );
         if (asistenciasResponse.success) {
-            document.getElementById("asistenciasHoy").textContent = asistenciasResponse.data.hoy;
+            document.getElementById("asistenciasHoy").textContent =
+                asistenciasResponse.data.hoy;
         }
 
-        const pagosResponse = await apiRequest('pagos.php?action=ingresos_mes', { method: 'GET' });
+        const pagosResponse = await apiRequest(
+            "pagos.php?action=ingresos_mes",
+            { method: "GET" },
+        );
         if (pagosResponse.success) {
-            document.getElementById("ingresosDelMes").textContent = formatCurrency(pagosResponse.data.total);
+            document.getElementById("ingresosDelMes").textContent =
+                formatCurrency(pagosResponse.data.total);
         }
 
         await updateAlertasVencimiento();
         await updateUltimasAsistencias();
     } catch (error) {
-        console.error('Error al actualizar dashboard:', error);
+        console.error("Error al actualizar dashboard:", error);
     }
 }
 async function updateAlertasVencimiento() {
     const container = document.getElementById("alertasVencimiento");
 
     try {
-        const response = await apiRequest('socios.php?action=morosos', { method: 'GET' });
-        
+        const response = await apiRequest("socios.php?action=morosos", {
+            method: "GET",
+        });
+
         if (!response.success) {
-            container.innerHTML = '<p class="text-center">Error al cargar alertas</p>';
+            container.innerHTML =
+                '<p class="text-center">Error al cargar alertas</p>';
             return;
         }
 
@@ -1348,16 +1460,19 @@ async function updateAlertasVencimiento() {
             return;
         }
 
-        container.innerHTML = morosos.map(socio => {
-            const fechaVenc = new Date(socio.vencimiento + 'T00:00:00');
-            const hoy = new Date();
-            const diasVencido = Math.floor((hoy - fechaVenc) / (1000 * 60 * 60 * 24));
-            
-            return `
+        container.innerHTML = morosos
+            .map((socio) => {
+                const fechaVenc = new Date(socio.vencimiento + "T00:00:00");
+                const hoy = new Date();
+                const diasVencido = Math.floor(
+                    (hoy - fechaVenc) / (1000 * 60 * 60 * 24),
+                );
+
+                return `
                 <div class="alert-item alert-moroso">
                     <div class="alert-item-info">
                         <p class="alert-nombre">${socio.nombre}</p>
-                        <p class="alert-detalle">Vencido hace ${diasVencido} día${diasVencido !== 1 ? 's' : ''}</p>
+                        <p class="alert-detalle">Vencido hace ${diasVencido} día${diasVencido !== 1 ? "s" : ""}</p>
                         <p class="alert-fecha">Vencimiento: ${formatDate(socio.vencimiento)}</p>
                     </div>
                     <div class="alert-icon">
@@ -1365,9 +1480,10 @@ async function updateAlertasVencimiento() {
                     </div>
                 </div>
             `;
-        }).join('');
+            })
+            .join("");
     } catch (error) {
-        console.error('Error al cargar alertas:', error);
+        console.error("Error al cargar alertas:", error);
     }
 }
 
@@ -1375,21 +1491,27 @@ async function updateUltimasAsistencias() {
     const container = document.getElementById("ultimasAsistencias");
 
     try {
-        const response = await apiRequest('asistencias.php?action=hoy', { method: 'GET' });
-        
+        const response = await apiRequest("asistencias.php?action=hoy", {
+            method: "GET",
+        });
+
         if (!response.success) {
-            container.innerHTML = '<p class="text-center">Error al cargar asistencias</p>';
+            container.innerHTML =
+                '<p class="text-center">Error al cargar asistencias</p>';
             return;
         }
 
         const asistencias = response.data.slice(-5).reverse();
 
         if (asistencias.length === 0) {
-            container.innerHTML = '<p class="text-center" style="color: var(--text-light);">No hay asistencias hoy</p>';
+            container.innerHTML =
+                '<p class="text-center" style="color: var(--text-light);">No hay asistencias hoy</p>';
             return;
         }
 
-        container.innerHTML = asistencias.map(asistencia => `
+        container.innerHTML = asistencias
+            .map(
+                (asistencia) => `
             <div class="attendance-item">
                 <div class="attendance-item-info">
                     <p>${asistencia.nombre}</p>
@@ -1397,9 +1519,11 @@ async function updateUltimasAsistencias() {
                 </div>
                 <i class="fas fa-check-circle"></i>
             </div>
-        `).join('');
+        `,
+            )
+            .join("");
     } catch (error) {
-        console.error('Error al cargar asistencias:', error);
+        console.error("Error al cargar asistencias:", error);
     }
 }
 
@@ -1407,43 +1531,60 @@ async function updateUltimasAsistencias() {
 // MÓDULO GESTIÓN DE USUARIOS
 
 function initUsuariosModule() {
-    document.getElementById("btnNuevoUsuario")?.addEventListener("click", abrirModalNuevoUsuario);
-    document.getElementById("formNuevoUsuario")?.addEventListener("submit", guardarNuevoUsuario);
-    document.getElementById("searchUsuarios")?.addEventListener("input", updateUsuariosTable);
-    
+    document
+        .getElementById("btnNuevoUsuario")
+        ?.addEventListener("click", abrirModalNuevoUsuario);
+    document
+        .getElementById("formNuevoUsuario")
+        ?.addEventListener("submit", guardarNuevoUsuario);
+    document
+        .getElementById("searchUsuarios")
+        ?.addEventListener("input", updateUsuariosTable);
+
     const btnNuevoUsuario = document.getElementById("btnNuevoUsuario");
     if (btnNuevoUsuario) {
-        btnNuevoUsuario.style.display = tienePermiso("usuarios", "crear") ? "flex" : "none";
+        btnNuevoUsuario.style.display = tienePermiso("usuarios", "crear")
+            ? "flex"
+            : "none";
     }
-    
+
     updateUsuariosTable();
 }
 
 async function updateUsuariosTable() {
-    const searchTerm = document.getElementById("searchUsuarios").value.toLowerCase();
+    const searchTerm = document
+        .getElementById("searchUsuarios")
+        .value.toLowerCase();
     const tbody = document.getElementById("tablaUsuarios");
 
     try {
-        const response = await apiRequest('usuarios.php?action=all', { method: 'GET' });
-        
+        const response = await apiRequest("usuarios.php?action=all", {
+            method: "GET",
+        });
+
         if (!response.success) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center">Error al cargar usuarios</td></tr>';
+            tbody.innerHTML =
+                '<tr><td colspan="5" class="text-center">Error al cargar usuarios</td></tr>';
             return;
         }
 
-        const usuarios = response.data.filter(usuario =>
-            (usuario.nombre.toLowerCase().includes(searchTerm) ||
-             usuario.username.toLowerCase().includes(searchTerm) ||
-             usuario.rol.toLowerCase().includes(searchTerm)) &&
-            usuario.id !== currentUser.id
+        const usuarios = response.data.filter(
+            (usuario) =>
+                (usuario.nombre.toLowerCase().includes(searchTerm) ||
+                    usuario.username.toLowerCase().includes(searchTerm) ||
+                    usuario.rol.toLowerCase().includes(searchTerm)) &&
+                usuario.id !== currentUser.id,
         );
 
         if (usuarios.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center">No se encontraron usuarios</td></tr>';
+            tbody.innerHTML =
+                '<tr><td colspan="5" class="text-center">No se encontraron usuarios</td></tr>';
             return;
         }
 
-        tbody.innerHTML = usuarios.map(usuario => `
+        tbody.innerHTML = usuarios
+            .map(
+                (usuario) => `
             <tr>
                 <td>
                     <div class="usuario-info">
@@ -1457,33 +1598,40 @@ async function updateUsuariosTable() {
                     </div>
                 </td>
                 <td>
-                    <span class="badge-rol badge-rol-${usuario.rol.toLowerCase().replace(/\s/g, '')}">
+                    <span class="badge-rol badge-rol-${usuario.rol.toLowerCase().replace(/\s/g, "")}">
                         ${usuario.rol}
                     </span>
                 </td>
                 <td>
-                    <span class="estado-badge ${usuario.activo ? 'estado-activo' : 'estado-inactivo'}">
+                    <span class="estado-badge ${usuario.activo ? "estado-activo" : "estado-inactivo"}">
                         <i class="fas fa-circle"></i>
-                        ${usuario.activo ? 'Activo' : 'Inactivo'}
+                        ${usuario.activo ? "Activo" : "Inactivo"}
                     </span>
                 </td>
-                <td>${usuario.fecha_creacion ? formatDate(usuario.fecha_creacion) : '-'}</td>
+                <td>${usuario.fecha_creacion ? formatDate(usuario.fecha_creacion) : "-"}</td>
                 <td>
                     <div class="action-buttons">
                         <button class="btn-table btn-edit" onclick="editarUsuario(${usuario.id})">
                             <i class="fas fa-edit"></i>
                         </button>
-                        ${currentUser.rol === 'Administrador' && usuario.rol !== 'Administrador' ? `
+                        ${
+                            currentUser.rol === "Administrador" &&
+                            usuario.rol !== "Administrador"
+                                ? `
                             <button class="btn-table btn-delete" onclick="eliminarUsuario(${usuario.id})">
                                 <i class="fas fa-trash"></i>
                             </button>
-                        ` : ''}
+                        `
+                                : ""
+                        }
                     </div>
                 </td>
             </tr>
-        `).join('');
+        `,
+            )
+            .join("");
     } catch (error) {
-        console.error('Error al cargar usuarios:', error);
+        console.error("Error al cargar usuarios:", error);
     }
 }
 
@@ -1513,8 +1661,8 @@ function generarUsername(nombre, apellido) {
     return username;
 }
 
+// Función auxiliar para generar password (si no existe)
 function generarPassword() {
-    // Generar contraseña aleatoria de 8 caracteres
     const caracteres =
         "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
     let password = "";
@@ -1528,37 +1676,41 @@ function generarPassword() {
 
 async function guardarNuevoUsuario(e) {
     e.preventDefault();
-    
+
     const nombre = document.getElementById("nuevoNombre").value.trim();
     const apellido = document.getElementById("nuevoApellido").value.trim();
     const email = document.getElementById("nuevoEmail").value.trim();
     const rol = document.getElementById("nuevoRol").value;
-    
-    const username = (nombre.charAt(0) + apellido).toLowerCase().replace(/\s/g, '');
+
+    const username = (nombre.charAt(0) + apellido)
+        .toLowerCase()
+        .replace(/\s/g, "");
     const password = generarPassword();
     const nombreCompleto = `${nombre} ${apellido}`;
-    
+
     try {
-        const response = await apiRequest('usuarios.php', {
-            method: 'POST',
+        const response = await apiRequest("usuarios.php", {
+            method: "POST",
             body: JSON.stringify({
                 username: username,
                 password: password,
                 nombre: nombreCompleto,
-                rol: rol
-            })
+                rol: rol,
+            }),
         });
-        
+
         if (response.success) {
-            alert(`Usuario creado:\nUsuario: ${username}\nContraseña: ${password}`);
+            alert(
+                `Usuario creado:\nUsuario: ${username}\nContraseña: ${password}`,
+            );
             cerrarModalUsuario();
             updateUsuariosTable();
         } else {
-            alert('Error: ' + response.message);
+            alert("Error: " + response.message);
         }
     } catch (error) {
-        console.error('Error al crear usuario:', error);
-        alert('Error al crear usuario');
+        console.error("Error al crear usuario:", error);
+        alert("Error al crear usuario");
     }
 }
 
@@ -1730,20 +1882,22 @@ async function eliminarUsuario(id) {
         mostrarErrorPermisos();
         return;
     }
-    
-    if (!confirm('¿Estás seguro de eliminar este usuario?')) return;
-    
+
+    if (!confirm("¿Estás seguro de eliminar este usuario?")) return;
+
     try {
-        const response = await apiRequest(`usuarios.php?id=${id}`, { method: 'DELETE' });
-        
+        const response = await apiRequest(`usuarios.php?id=${id}`, {
+            method: "DELETE",
+        });
+
         if (response.success) {
-            alert('Usuario eliminado correctamente');
+            alert("Usuario eliminado correctamente");
             updateUsuariosTable();
         } else {
-            alert('Error: ' + response.message);
+            alert("Error: " + response.message);
         }
     } catch (error) {
-        console.error('Error al eliminar usuario:', error);
+        console.error("Error al eliminar usuario:", error);
     }
 }
 
@@ -1757,49 +1911,65 @@ function getDefaultVencimiento() {
 // MÓDULO SOCIOS
 
 function initSociosModule() {
-    document.getElementById("searchSocios")?.addEventListener("input", updateSociosTable);
-    document.getElementById("formNuevoSocio")?.addEventListener("submit", guardarNuevoSocio);
-    document.getElementById("socioPlan")?.addEventListener("change", actualizarVencimientoSocio);
-    
+    document
+        .getElementById("searchSocios")
+        ?.addEventListener("input", updateSociosTable);
+    document
+        .getElementById("formNuevoSocio")
+        ?.addEventListener("submit", guardarNuevoSocio);
+    document
+        .getElementById("socioPlan")
+        ?.addEventListener("change", actualizarVencimientoSocio);
+
     const btnNuevoSocio = document.getElementById("btnNuevoSocio");
     if (btnNuevoSocio) {
-        btnNuevoSocio.style.display = tienePermiso("socios", "crear") ? "flex" : "none";
+        btnNuevoSocio.style.display = tienePermiso("socios", "crear")
+            ? "flex"
+            : "none";
     }
-    
+
     updateSociosTable();
 }
 
 // Cargar socios desde la API
+// CAMBIAR EN script.js - Línea aproximada 2350
+// Esta función está usando database local, cambiar por:
+
 async function updateSociosTable() {
-    const searchTerm = document.getElementById("searchSocios").value.toLowerCase();
+    const searchTerm = document
+        .getElementById("searchSocios")
+        .value.toLowerCase();
     const tbody = document.getElementById("tablaSocios");
 
     try {
-        // Llamar a la API real
-        const response = await apiRequest('socios.php?action=all', { method: 'GET' });
-        
+        // USAR API EN LUGAR DE database
+        const response = await apiRequest("socios.php?action=all", {
+            method: "GET",
+        });
+
         if (!response.success) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center">Error al cargar socios</td></tr>';
+            tbody.innerHTML =
+                '<tr><td colspan="6" class="text-center">Error al cargar socios</td></tr>';
             return;
         }
 
-        const socios = response.data;
-
-        // Filtrar por búsqueda
-        const filteredSocios = socios.filter(socio =>
-            socio.nombre.toLowerCase().includes(searchTerm) ||
-            socio.dni.includes(searchTerm)
+        const socios = response.data.filter(
+            (socio) =>
+                socio.nombre.toLowerCase().includes(searchTerm) ||
+                socio.dni.includes(searchTerm),
         );
 
-        if (filteredSocios.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center">No se encontraron socios</td></tr>';
+        if (socios.length === 0) {
+            tbody.innerHTML =
+                '<tr><td colspan="6" class="text-center">No se encontraron socios</td></tr>';
             return;
         }
 
-        tbody.innerHTML = filteredSocios.map(socio => {
-            let estadoMostrar = socio.estado;
-            
-            return `
+        tbody.innerHTML = socios
+            .map((socio) => {
+                let estadoMostrar = socio.estado;
+
+                return `
             <tr>
                 <td>
                     <div>
@@ -1811,7 +1981,7 @@ async function updateSociosTable() {
                 <td>${socio.plan}</td>
                 <td>${formatDate(socio.vencimiento)}</td>
                 <td>
-                    <span class="badge ${estadoMostrar === 'Activo' ? 'badge-active' : 'badge-moroso'}">
+                    <span class="badge ${estadoMostrar === "Activo" ? "badge-active" : "badge-moroso"}">
                         ${estadoMostrar}
                     </span>
                 </td>
@@ -1820,48 +1990,58 @@ async function updateSociosTable() {
                         <button class="btn-table btn-ver-estado" onclick="verEstadoPlan(${socio.id})" title="Ver estado del plan">
                             <i class="fas fa-chart-line"></i> Estado
                         </button>
-                        ${tienePermiso('socios', 'editar') ? `
+                        ${
+                            tienePermiso("socios", "editar")
+                                ? `
                             <button class="btn-table btn-edit" onclick="editarSocio(${socio.id})">
                                 <i class="fas fa-edit"></i> Editar
                             </button>
-                        ` : ''}
-                        ${tienePermiso('socios', 'eliminar') ? `
+                        `
+                                : ""
+                        }
+                        ${
+                            tienePermiso("socios", "eliminar")
+                                ? `
                             <button class="btn-table btn-delete" onclick="eliminarSocio(${socio.id})">
                                 <i class="fas fa-trash"></i> Eliminar
                             </button>
-                        ` : ''}
+                        `
+                                : ""
+                        }
                     </div>
                 </td>
             </tr>
         `;
-        }).join('');
-        
+            })
+            .join("");
     } catch (error) {
-        console.error('Error al cargar socios:', error);
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center">Error al cargar datos</td></tr>';
+        console.error("Error al cargar socios:", error);
+        tbody.innerHTML =
+            '<tr><td colspan="6" class="text-center">Error al cargar datos</td></tr>';
     }
 }
-
 async function eliminarSocio(id) {
     if (!tienePermiso("socios", "eliminar")) {
         mostrarErrorPermisos();
         return;
     }
-    
-    if (!confirm('¿Estás seguro de eliminar este socio?')) return;
-    
+
+    if (!confirm("¿Estás seguro de eliminar este socio?")) return;
+
     try {
-        const response = await apiRequest(`socios.php?id=${id}`, { method: 'DELETE' });
-        
+        const response = await apiRequest(`socios.php?id=${id}`, {
+            method: "DELETE",
+        });
+
         if (response.success) {
-            alert('Socio eliminado correctamente');
+            alert("Socio eliminado correctamente");
             updateSociosTable();
-            if (activeModule === 'dashboard') updateDashboard();
+            if (activeModule === "dashboard") updateDashboard();
         } else {
-            alert('Error: ' + response.message);
+            alert("Error: " + response.message);
         }
     } catch (error) {
-        console.error('Error al eliminar socio:', error);
+        console.error("Error al eliminar socio:", error);
     }
 }
 
@@ -1886,7 +2066,7 @@ function abrirModalNuevoSocio() {
         mostrarErrorPermisos();
         return;
     }
-    
+
     document.getElementById("modalNuevoSocio").style.display = "flex";
     document.getElementById("formNuevoSocio").reset();
     document.getElementById("socioFechaAlta").value = getTodayString();
@@ -1896,31 +2076,41 @@ function cerrarModalNuevoSocio() {
     document.getElementById("modalNuevoSocio").style.display = "none";
 }
 
-
 async function actualizarVencimientoSocio() {
     const planId = parseInt(document.getElementById("socioPlan").value);
-    
+
     if (!planId) return;
-    
+
     try {
-        const response = await apiRequest(`planes.php?id=${planId}`, { method: 'GET' });
-        
+        const response = await apiRequest(`planes.php?id=${planId}`, {
+            method: "GET",
+        });
+
         if (response.success) {
             const plan = response.data;
-            const fechaAlta = new Date(document.getElementById("socioFechaAlta").value + "T00:00:00");
+            const fechaAlta = new Date(
+                document.getElementById("socioFechaAlta").value + "T00:00:00",
+            );
             const fechaVencimiento = new Date(fechaAlta);
-            fechaVencimiento.setDate(fechaVencimiento.getDate() + plan.duracion);
-            
-            document.getElementById("socioVencimiento").value = fechaVencimiento.toISOString().split("T")[0];
-            
+            fechaVencimiento.setDate(
+                fechaVencimiento.getDate() + plan.duracion,
+            );
+
+            document.getElementById("socioVencimiento").value = fechaVencimiento
+                .toISOString()
+                .split("T")[0];
+
             const preview = document.getElementById("planPreview");
-            document.getElementById("planNombrePreview").textContent = plan.nombre;
-            document.getElementById("planDetallesPreview").textContent = `${plan.descripcion} - ${plan.duracion} días`;
-            document.getElementById("planPrecioPreview").textContent = formatCurrency(plan.costo);
+            document.getElementById("planNombrePreview").textContent =
+                plan.nombre;
+            document.getElementById("planDetallesPreview").textContent =
+                `${plan.descripcion} - ${plan.duracion} días`;
+            document.getElementById("planPrecioPreview").textContent =
+                formatCurrency(plan.costo);
             preview.style.display = "flex";
         }
     } catch (error) {
-        console.error('Error al cargar plan:', error);
+        console.error("Error al cargar plan:", error);
     }
 }
 
@@ -1948,39 +2138,67 @@ async function guardarNuevoSocio(e) {
     }
 
     try {
-        // Buscar el nombre del plan
-        const planesResponse = await apiRequest('planes.php?action=all', { method: 'GET' });
-        const plan = planesResponse.data.find(p => p.id === planId);
+        // Obtener información del plan seleccionado
+        const planesResponse = await apiRequest("planes.php?action=all", {
+            method: "GET",
+        });
+
+        if (!planesResponse.success) {
+            alert("Error al cargar planes");
+            return;
+        }
+
+        const plan = planesResponse.data.find((p) => p.id === planId);
 
         if (!plan) {
-            alert('Error: Plan no encontrado');
+            alert("Error: Plan no encontrado");
             return;
         }
 
         // Crear el socio
-        const response = await apiRequest('socios.php', {
-            method: 'POST',
+        const response = await apiRequest("socios.php", {
+            method: "POST",
             body: JSON.stringify({
                 nombre: nombre,
                 dni: dni,
                 email: email,
                 telefono: telefono,
-                plan: plan.nombre
-            })
+                plan: plan.nombre,
+            }),
         });
 
         if (response.success) {
-            // Mostrar confirmación
-            const socioId = response.data.id;
+            // Ocultar el formulario
+            document.getElementById("formNuevoSocio").style.display = "none";
+
+            // Generar credenciales
+            const username = `socio${dni}`;
+            const password = generarPassword();
+
+            // Calcular vencimiento
+            const vencimiento = calcularVencimiento(plan.duracion);
+
+            // Mostrar confirmación con las credenciales
             mostrarConfirmacionSocio(
-                { id: socioId, nombre, dni, plan: plan.nombre, vencimiento: calcularVencimiento(plan.duracion) },
-                `socio${dni}`,
-                generarPassword(),
-                plan
+                {
+                    id: response.data.id,
+                    nombre: nombre,
+                    dni: dni,
+                    plan: plan.nombre,
+                    vencimiento: vencimiento,
+                },
+                username,
+                password,
+                plan,
             );
 
-            updateSociosTable();
-            document.getElementById("formNuevoSocio").style.display = "none";
+            // IMPORTANTE: Actualizar la tabla de socios
+            await updateSociosTable();
+
+            // Si estamos en el dashboard, actualizarlo también
+            if (activeModule === "dashboard") {
+                await updateDashboard();
+            }
         } else {
             errorDiv.innerHTML = `
                 <i class="fas fa-exclamation-triangle"></i>
@@ -1991,19 +2209,17 @@ async function guardarNuevoSocio(e) {
             `;
             errorDiv.style.display = "flex";
         }
-        
     } catch (error) {
-        console.error('Error al guardar socio:', error);
-        alert('Error al registrar el socio');
+        console.error("Error al guardar socio:", error);
+        alert("Error al registrar el socio");
     }
 }
-
+// Función auxiliar para calcular vencimiento
 function calcularVencimiento(duracion) {
     const hoy = new Date();
     hoy.setDate(hoy.getDate() + duracion);
-    return hoy.toISOString().split('T')[0];
+    return hoy.toISOString().split("T")[0];
 }
-
 function generarUsernameFromDNI(dni) {
     let username = "socio" + dni;
     let contador = 1;
@@ -2075,10 +2291,18 @@ IMPORTANTE:
     URL.revokeObjectURL(url);
 }
 
-function finalizarRegistroSocio() {
+async function finalizarRegistroSocio() {
     cerrarModalNuevoSocio();
     document.getElementById("formNuevoSocio").style.display = "block";
     document.getElementById("socioRegistrado").style.display = "none";
+
+    // Asegurarse de actualizar la tabla al finalizar
+    await updateSociosTable();
+
+    // Si estamos en dashboard, actualizarlo
+    if (activeModule === "dashboard") {
+        await updateDashboard();
+    }
 }
 // ============================================
 // VERIFICACIÓN DE SOCIO EXISTENTE
@@ -2644,7 +2868,9 @@ function cerrarModalPerfilSocio() {
 // MÓDULO ASISTENCIAS
 
 function initAsistenciasModule() {
-    document.getElementById("btnRegistrarAsistencia")?.addEventListener("click", registrarAsistencia);
+    document
+        .getElementById("btnRegistrarAsistencia")
+        ?.addEventListener("click", registrarAsistencia);
     updateAsistenciasTable();
 }
 
@@ -2658,17 +2884,17 @@ async function registrarAsistencia() {
     }
 
     try {
-        const response = await apiRequest('asistencias.php', {
-            method: 'POST',
-            body: JSON.stringify({ dni: dni })
+        const response = await apiRequest("asistencias.php", {
+            method: "POST",
+            body: JSON.stringify({ dni: dni }),
         });
 
         if (response.success) {
             showMessage(mensajeDiv, response.message, "success");
             document.getElementById("dniAsistencia").value = "";
             updateAsistenciasTable();
-            if (activeModule === 'dashboard') updateDashboard();
-            
+            if (activeModule === "dashboard") updateDashboard();
+
             setTimeout(() => {
                 mensajeDiv.style.display = "none";
             }, 3000);
@@ -2676,7 +2902,7 @@ async function registrarAsistencia() {
             showMessage(mensajeDiv, response.message, "error");
         }
     } catch (error) {
-        console.error('Error al registrar asistencia:', error);
+        console.error("Error al registrar asistencia:", error);
         showMessage(mensajeDiv, "Error al registrar asistencia", "error");
     }
 }
@@ -2733,24 +2959,31 @@ async function updateAsistenciasTable() {
     const tbody = document.getElementById("tablaAsistencias");
 
     try {
-        const response = await apiRequest('asistencias.php?action=all', { method: 'GET' });
-        
+        const response = await apiRequest("asistencias.php?action=all", {
+            method: "GET",
+        });
+
         if (!response.success) {
-            tbody.innerHTML = '<tr><td colspan="3" class="text-center">Error al cargar asistencias</td></tr>';
+            tbody.innerHTML =
+                '<tr><td colspan="3" class="text-center">Error al cargar asistencias</td></tr>';
             return;
         }
 
         const asistencias = response.data.slice(0, 50).reverse();
 
-        tbody.innerHTML = asistencias.map(asistencia => `
+        tbody.innerHTML = asistencias
+            .map(
+                (asistencia) => `
             <tr>
                 <td>${asistencia.nombre}</td>
                 <td>${formatDate(asistencia.fecha)}</td>
                 <td>${asistencia.hora}</td>
             </tr>
-        `).join('');
+        `,
+            )
+            .join("");
     } catch (error) {
-        console.error('Error al cargar asistencias:', error);
+        console.error("Error al cargar asistencias:", error);
     }
 }
 
@@ -2759,89 +2992,97 @@ async function updateAsistenciasTable() {
 
 function initPagosModule() {
     loadSociosForPagos();
-    
-    document.getElementById('btnRegistrarPago')
-        .addEventListener('click', registrarPago);
-    
+
+    document
+        .getElementById("btnRegistrarPago")
+        .addEventListener("click", registrarPago);
+
     updatePagosTable();
 }
 
 async function loadSociosForPagos() {
-    const select = document.getElementById('socioSeleccionado');
-    
+    const select = document.getElementById("socioSeleccionado");
+
     try {
-        const response = await apiRequest('socios.php?action=all', {
-            method: 'GET'
+        const response = await apiRequest("socios.php?action=all", {
+            method: "GET",
         });
-        
+
         if (response.success) {
-            select.innerHTML = '<option value="">Seleccionar Socio</option>' +
-                response.data.map(s => 
-                    `<option value="${s.id}">${s.nombre} - DNI: ${s.dni}</option>`
-                ).join('');
+            select.innerHTML =
+                '<option value="">Seleccionar Socio</option>' +
+                response.data
+                    .map(
+                        (s) =>
+                            `<option value="${s.id}">${s.nombre} - DNI: ${s.dni}</option>`,
+                    )
+                    .join("");
         }
     } catch (error) {
-        console.error('Error al cargar socios:', error);
+        console.error("Error al cargar socios:", error);
     }
 }
 async function registrarPago() {
-    if (!tienePermiso('pagos', 'crear')) {
+    if (!tienePermiso("pagos", "crear")) {
         mostrarErrorPermisos();
         return;
     }
 
-    const socioId = parseInt(document.getElementById('socioSeleccionado').value);
-    const monto = parseFloat(document.getElementById('montoPago').value);
-    const metodoPago = document.getElementById('metodoPago').value;
+    const socioId = parseInt(
+        document.getElementById("socioSeleccionado").value,
+    );
+    const monto = parseFloat(document.getElementById("montoPago").value);
+    const metodoPago = document.getElementById("metodoPago").value;
 
     if (!socioId || !monto) {
-        alert('Por favor complete todos los campos');
+        alert("Por favor complete todos los campos");
         return;
     }
 
     try {
-        const response = await apiRequest('pagos.php', {
-            method: 'POST',
+        const response = await apiRequest("pagos.php", {
+            method: "POST",
             body: JSON.stringify({
                 socio_id: socioId,
                 monto: monto,
                 metodo_pago: metodoPago,
-                concepto: 'Cuota Mensual'
-            })
+                concepto: "Cuota Mensual",
+            }),
         });
 
         if (response.success) {
-            document.getElementById('socioSeleccionado').value = '';
-            document.getElementById('montoPago').value = '';
-            
-            alert('✅ ' + response.message);
+            document.getElementById("socioSeleccionado").value = "";
+            document.getElementById("montoPago").value = "";
+
+            alert("✅ " + response.message);
             updatePagosTable();
-            
-            if (activeModule === 'dashboard') {
+
+            if (activeModule === "dashboard") {
                 updateDashboard();
             }
         } else {
-            alert('❌ Error: ' + response.message);
+            alert("❌ Error: " + response.message);
         }
     } catch (error) {
-        console.error('Error al registrar pago:', error);
-        alert('❌ Error al registrar el pago');
+        console.error("Error al registrar pago:", error);
+        alert("❌ Error al registrar el pago");
     }
 }
 
 async function updatePagosTable() {
-    const tbody = document.getElementById('tablaPagos');
-    
+    const tbody = document.getElementById("tablaPagos");
+
     try {
-        const response = await apiRequest('pagos.php?action=all', {
-            method: 'GET'
+        const response = await apiRequest("pagos.php?action=all", {
+            method: "GET",
         });
 
         if (response.success && response.data.length > 0) {
             tbody.innerHTML = response.data
                 .slice()
                 .reverse()
-                .map(pago => `
+                .map(
+                    (pago) => `
                     <tr>
                         <td>${pago.socio_nombre}</td>
                         <td style="font-weight: 600; color: var(--success-color);">
@@ -2856,29 +3097,33 @@ async function updatePagosTable() {
                             </button>
                         </td>
                     </tr>
-                `).join('');
+                `,
+                )
+                .join("");
         } else {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="color: var(--text-light);">No hay pagos registrados</td></tr>';
+            tbody.innerHTML =
+                '<tr><td colspan="6" class="text-center" style="color: var(--text-light);">No hay pagos registrados</td></tr>';
         }
     } catch (error) {
-        console.error('Error al cargar pagos:', error);
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="color: var(--danger-color);">Error al cargar datos</td></tr>';
+        console.error("Error al cargar pagos:", error);
+        tbody.innerHTML =
+            '<tr><td colspan="6" class="text-center" style="color: var(--danger-color);">Error al cargar datos</td></tr>';
     }
 }
 
 async function generarTicket(pagoId) {
     try {
         const response = await apiRequest(`pagos.php?id=${pagoId}`, {
-            method: 'GET'
+            method: "GET",
         });
 
         if (!response.success) {
-            alert('Error al generar el ticket');
+            alert("Error al generar el ticket");
             return;
         }
 
         const pago = response.data;
-        const ticketContent = document.getElementById('ticketContent');
+        const ticketContent = document.getElementById("ticketContent");
 
         ticketContent.innerHTML = `
             <div class="ticket-header">
@@ -2893,7 +3138,7 @@ async function generarTicket(pagoId) {
             <div class="ticket-body">
                 <div class="ticket-section">
                     <h3>Comprobante de Pago</h3>
-                    <p class="ticket-number">N° ${String(pago.id).padStart(6, '0')}</p>
+                    <p class="ticket-number">N° ${String(pago.id).padStart(6, "0")}</p>
                 </div>
 
                 <div class="ticket-divider"></div>
@@ -2905,7 +3150,7 @@ async function generarTicket(pagoId) {
                     </div>
                     <div class="ticket-row">
                         <span class="ticket-label">Hora:</span>
-                        <span class="ticket-value">${new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span class="ticket-value">${new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}</span>
                     </div>
                 </div>
 
@@ -2955,48 +3200,52 @@ async function generarTicket(pagoId) {
             </div>
         `;
 
-        document.getElementById('ticketModal').style.display = 'flex';
+        document.getElementById("ticketModal").style.display = "flex";
     } catch (error) {
-        console.error('Error al generar ticket:', error);
-        alert('Error al generar el ticket');
+        console.error("Error al generar ticket:", error);
+        alert("Error al generar el ticket");
     }
 }
 // ============================================
 // MÓDULO PLANES
 
 function initPlanesModule() {
-    const btnNuevoPlan = document.getElementById('btnNuevoPlan');
+    const btnNuevoPlan = document.getElementById("btnNuevoPlan");
     if (btnNuevoPlan) {
-        if (currentUser.rol !== 'Administrador') {
-            btnNuevoPlan.style.display = 'none';
+        if (currentUser.rol !== "Administrador") {
+            btnNuevoPlan.style.display = "none";
         } else {
-            btnNuevoPlan.style.display = 'flex';
+            btnNuevoPlan.style.display = "flex";
         }
     }
     updatePlanesGrid();
 }
 
 async function updatePlanesGrid() {
-    const grid = document.getElementById('planesGrid');
+    const grid = document.getElementById("planesGrid");
 
     try {
-        const response = await apiRequest('planes.php?action=all', {
-            method: 'GET'
+        const response = await apiRequest("planes.php?action=all", {
+            method: "GET",
         });
 
         if (!response.success || response.data.length === 0) {
-            grid.innerHTML = '<p class="text-center" style="color: var(--text-light); padding: 40px;">No hay planes registrados</p>';
+            grid.innerHTML =
+                '<p class="text-center" style="color: var(--text-light); padding: 40px;">No hay planes registrados</p>';
             return;
         }
 
-        grid.innerHTML = response.data.map(plan => {
-            const activo = plan.activo != 0;
-            return `
-                <div class="plan-card ${!activo ? 'plan-inactivo' : ''}">
-                    ${!activo ? '<div class="plan-badge-inactivo">Inactivo</div>' : ''}
+        grid.innerHTML = response.data
+            .map((plan) => {
+                const activo = plan.activo != 0;
+                return `
+                <div class="plan-card ${!activo ? "plan-inactivo" : ""}">
+                    ${!activo ? '<div class="plan-badge-inactivo">Inactivo</div>' : ""}
                     <div class="plan-header">
                         <h3>${plan.nombre}</h3>
-                        ${currentUser.rol === 'Administrador' ? `
+                        ${
+                            currentUser.rol === "Administrador"
+                                ? `
                             <div class="plan-actions">
                                 <button class="btn-plan-action" onclick="editarPlan(${plan.id})" title="Editar">
                                     <i class="fas fa-edit"></i>
@@ -3005,7 +3254,9 @@ async function updatePlanesGrid() {
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
-                        ` : ''}
+                        `
+                                : ""
+                        }
                     </div>
                     <p class="plan-description">${plan.descripcion}</p>
                     <div class="plan-price">
@@ -3014,10 +3265,12 @@ async function updatePlanesGrid() {
                     </div>
                 </div>
             `;
-        }).join('');
+            })
+            .join("");
     } catch (error) {
-        console.error('Error al cargar planes:', error);
-        grid.innerHTML = '<p class="text-center" style="color: var(--danger-color);">Error al cargar planes</p>';
+        console.error("Error al cargar planes:", error);
+        grid.innerHTML =
+            '<p class="text-center" style="color: var(--danger-color);">Error al cargar planes</p>';
     }
 }
 
@@ -3199,18 +3452,24 @@ function verHistorialPagos() {
 // MÓDULO TURNOS
 
 function initTurnosModule() {
-    document.getElementById('filterDia').addEventListener('change', updateClasesDisponibles);
-    document.getElementById('filterActividad').addEventListener('change', updateClasesDisponibles);
-    
-    if (currentUser.rol === 'Recepcionista') {
+    document
+        .getElementById("filterDia")
+        .addEventListener("change", updateClasesDisponibles);
+    document
+        .getElementById("filterActividad")
+        .addEventListener("change", updateClasesDisponibles);
+
+    if (currentUser.rol === "Recepcionista") {
         agregarSelectorSocioEnTurnos();
     }
-    
+
     updateTurnosModule();
 }
 
 function agregarSelectorSocioEnTurnos() {
-    const turnosContainer = document.querySelector('#turnosModule .turnos-container');
+    const turnosContainer = document.querySelector(
+        "#turnosModule .turnos-container",
+    );
 
     const selectorHTML = `
         <div class="card selector-socio-turnos">
@@ -3238,83 +3497,98 @@ function agregarSelectorSocioEnTurnos() {
         </div>
     `;
 
-    turnosContainer.insertAdjacentHTML('afterbegin', selectorHTML);
+    turnosContainer.insertAdjacentHTML("afterbegin", selectorHTML);
 
-    document.getElementById('buscarSocioTurno').addEventListener('input', buscarSocioParaTurno);
-    document.getElementById('socioSeleccionadoTurno').addEventListener('change', mostrarInfoSocioTurno);
+    document
+        .getElementById("buscarSocioTurno")
+        .addEventListener("input", buscarSocioParaTurno);
+    document
+        .getElementById("socioSeleccionadoTurno")
+        .addEventListener("change", mostrarInfoSocioTurno);
 }
 
-
 async function buscarSocioParaTurno() {
-    const busqueda = document.getElementById('buscarSocioTurno').value.toLowerCase().trim();
-    const select = document.getElementById('socioSeleccionadoTurno');
+    const busqueda = document
+        .getElementById("buscarSocioTurno")
+        .value.toLowerCase()
+        .trim();
+    const select = document.getElementById("socioSeleccionadoTurno");
 
     if (busqueda.length < 2) {
         select.innerHTML = '<option value="">-- Ninguno --</option>';
-        document.getElementById('infoSocioSeleccionado').style.display = 'none';
+        document.getElementById("infoSocioSeleccionado").style.display = "none";
         return;
     }
 
     try {
         // Buscar por DNI exacto primero
         let response = await apiRequest(`socios.php?dni=${busqueda}`, {
-            method: 'GET'
+            method: "GET",
         });
 
         let socios = [];
-        
+
         if (response.success) {
             socios = [response.data];
         } else {
             // Si no encuentra por DNI, buscar por nombre
-            const allResponse = await apiRequest('socios.php?action=all', {
-                method: 'GET'
+            const allResponse = await apiRequest("socios.php?action=all", {
+                method: "GET",
             });
-            
+
             if (allResponse.success) {
-                socios = allResponse.data.filter(s => 
-                    s.nombre.toLowerCase().includes(busqueda) ||
-                    s.dni.includes(busqueda)
+                socios = allResponse.data.filter(
+                    (s) =>
+                        s.nombre.toLowerCase().includes(busqueda) ||
+                        s.dni.includes(busqueda),
                 );
             }
         }
 
         if (socios.length > 0) {
-            select.innerHTML = '<option value="">-- Seleccionar --</option>' +
-                socios.map(s => 
-                    `<option value="${s.id}">${s.nombre} - DNI: ${s.dni} (${s.estado})</option>`
-                ).join('');
+            select.innerHTML =
+                '<option value="">-- Seleccionar --</option>' +
+                socios
+                    .map(
+                        (s) =>
+                            `<option value="${s.id}">${s.nombre} - DNI: ${s.dni} (${s.estado})</option>`,
+                    )
+                    .join("");
         } else {
-            select.innerHTML = '<option value="">-- No se encontraron resultados --</option>';
+            select.innerHTML =
+                '<option value="">-- No se encontraron resultados --</option>';
         }
     } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
         select.innerHTML = '<option value="">-- Error al buscar --</option>';
     }
 }
 
 async function mostrarInfoSocioTurno() {
-    const socioId = parseInt(document.getElementById('socioSeleccionadoTurno').value);
-    const infoDiv = document.getElementById('infoSocioSeleccionado');
+    const socioId = parseInt(
+        document.getElementById("socioSeleccionadoTurno").value,
+    );
+    const infoDiv = document.getElementById("infoSocioSeleccionado");
 
     if (!socioId) {
-        infoDiv.style.display = 'none';
+        infoDiv.style.display = "none";
         updateMisTurnos();
         return;
     }
 
     try {
         const response = await apiRequest(`socios.php?id=${socioId}`, {
-            method: 'GET'
+            method: "GET",
         });
 
         if (!response.success) {
-            infoDiv.style.display = 'none';
+            infoDiv.style.display = "none";
             return;
         }
 
         const socio = response.data;
-        const estadoClass = socio.estado === 'Activo' ? 'badge-active' : 'badge-moroso';
+        const estadoClass =
+            socio.estado === "Activo" ? "badge-active" : "badge-moroso";
 
         infoDiv.innerHTML = `
             <div class="socio-info-header">
@@ -3330,13 +3604,13 @@ async function mostrarInfoSocioTurno() {
                 <div><i class="fas fa-clock"></i> Vence: ${formatDate(socio.vencimiento)}</div>
             </div>
         `;
-        infoDiv.style.display = 'block';
-        
+        infoDiv.style.display = "block";
+
         // Actualizar turnos del socio seleccionado
         updateMisTurnos();
     } catch (error) {
-        console.error('Error:', error);
-        infoDiv.style.display = 'none';
+        console.error("Error:", error);
+        infoDiv.style.display = "none";
     }
 }
 
@@ -3346,53 +3620,60 @@ function updateTurnosModule() {
 }
 
 async function updateClasesDisponibles() {
-    const filterDia = document.getElementById('filterDia').value;
-    const filterActividad = document.getElementById('filterActividad').value;
-    const container = document.getElementById('clasesDisponibles');
+    const filterDia = document.getElementById("filterDia").value;
+    const filterActividad = document.getElementById("filterActividad").value;
+    const container = document.getElementById("clasesDisponibles");
 
     try {
-        const response = await apiRequest('clases.php?action=all', {
-            method: 'GET'
+        const response = await apiRequest("clases.php?action=all", {
+            method: "GET",
         });
 
         if (!response.success) {
-            container.innerHTML = '<p class="text-center" style="color: var(--danger-color);">Error al cargar clases</p>';
+            container.innerHTML =
+                '<p class="text-center" style="color: var(--danger-color);">Error al cargar clases</p>';
             return;
         }
 
         let clasesFiltered = response.data;
 
         if (filterDia) {
-            clasesFiltered = clasesFiltered.filter(c => c.dia === filterDia);
+            clasesFiltered = clasesFiltered.filter((c) => c.dia === filterDia);
         }
 
         if (filterActividad) {
-            clasesFiltered = clasesFiltered.filter(c => c.nombre === filterActividad);
+            clasesFiltered = clasesFiltered.filter(
+                (c) => c.nombre === filterActividad,
+            );
         }
 
         if (clasesFiltered.length === 0) {
-            container.innerHTML = '<p class="text-center" style="color: var(--text-light); padding: 20px;">No hay clases disponibles con estos filtros</p>';
+            container.innerHTML =
+                '<p class="text-center" style="color: var(--text-light); padding: 20px;">No hay clases disponibles con estos filtros</p>';
             return;
         }
 
-        container.innerHTML = clasesFiltered.map(clase => {
-            const cuposDisponibles = clase.cupos_total - clase.cupos_ocupados;
-            const porcentaje = (clase.cupos_ocupados / clase.cupos_total) * 100;
+        container.innerHTML = clasesFiltered
+            .map((clase) => {
+                const cuposDisponibles =
+                    clase.cupos_total - clase.cupos_ocupados;
+                const porcentaje =
+                    (clase.cupos_ocupados / clase.cupos_total) * 100;
 
-            let cuposClass = 'cupos-disponible';
-            let cuposText = `${cuposDisponibles} cupos disponibles`;
-            let btnDisabled = false;
+                let cuposClass = "cupos-disponible";
+                let cuposText = `${cuposDisponibles} cupos disponibles`;
+                let btnDisabled = false;
 
-            if (cuposDisponibles === 0) {
-                cuposClass = 'cupos-lleno';
-                cuposText = 'Completo';
-                btnDisabled = true;
-            } else if (porcentaje >= 80) {
-                cuposClass = 'cupos-limitado';
-                cuposText = `Solo ${cuposDisponibles} cupos`;
-            }
+                if (cuposDisponibles === 0) {
+                    cuposClass = "cupos-lleno";
+                    cuposText = "Completo";
+                    btnDisabled = true;
+                } else if (porcentaje >= 80) {
+                    cuposClass = "cupos-limitado";
+                    cuposText = `Solo ${cuposDisponibles} cupos`;
+                }
 
-            return `
+                return `
                 <div class="clase-card">
                     <div class="clase-info">
                         <h4>${clase.nombre}</h4>
@@ -3407,25 +3688,29 @@ async function updateClasesDisponibles() {
                     <button 
                         class="btn-reservar" 
                         onclick="reservarClase(${clase.id})"
-                        ${btnDisabled ? 'disabled' : ''}
+                        ${btnDisabled ? "disabled" : ""}
                     >
                         Reservar
                     </button>
                 </div>
             `;
-        }).join('');
+            })
+            .join("");
     } catch (error) {
-        console.error('Error:', error);
-        container.innerHTML = '<p class="text-center" style="color: var(--danger-color);">Error al cargar clases</p>';
+        console.error("Error:", error);
+        container.innerHTML =
+            '<p class="text-center" style="color: var(--danger-color);">Error al cargar clases</p>';
     }
 }
 
 async function updateMisTurnos() {
-    const container = document.getElementById('misTurnosReservados');
+    const container = document.getElementById("misTurnosReservados");
     let socioId;
 
-    if (currentUser.rol === 'Recepcionista') {
-        socioId = parseInt(document.getElementById('socioSeleccionadoTurno')?.value);
+    if (currentUser.rol === "Recepcionista") {
+        socioId = parseInt(
+            document.getElementById("socioSeleccionadoTurno")?.value,
+        );
         if (!socioId) {
             container.innerHTML = `
                 <div class="sin-turnos">
@@ -3440,9 +3725,12 @@ async function updateMisTurnos() {
     }
 
     try {
-        const response = await apiRequest(`clases.php?action=mis_turnos&socio_id=${socioId}`, {
-            method: 'GET'
-        });
+        const response = await apiRequest(
+            `clases.php?action=mis_turnos&socio_id=${socioId}`,
+            {
+                method: "GET",
+            },
+        );
 
         if (!response.success || response.data.length === 0) {
             container.innerHTML = `
@@ -3454,14 +3742,20 @@ async function updateMisTurnos() {
             return;
         }
 
-        container.innerHTML = response.data.map(turno => `
+        container.innerHTML = response.data
+            .map(
+                (turno) => `
             <div class="turno-item">
-                ${currentUser.rol === 'Recepcionista' ? `
+                ${
+                    currentUser.rol === "Recepcionista"
+                        ? `
                     <div class="turno-socio-info">
                         <i class="fas fa-user"></i>
                         <strong>${turno.nombre}</strong>
                     </div>
-                ` : ''}
+                `
+                        : ""
+                }
                 <h4>${turno.nombre}</h4>
                 <p><i class="fas fa-calendar"></i> ${turno.dia} - ${formatDate(turno.fecha)}</p>
                 <p><i class="fas fa-clock"></i> ${turno.hora} (${turno.duracion} min)</p>
@@ -3475,49 +3769,59 @@ async function updateMisTurnos() {
                     </button>
                 </div>
             </div>
-        `).join('');
+        `,
+            )
+            .join("");
     } catch (error) {
-        console.error('Error:', error);
-        container.innerHTML = '<p class="text-center" style="color: var(--danger-color);">Error al cargar turnos</p>';
+        console.error("Error:", error);
+        container.innerHTML =
+            '<p class="text-center" style="color: var(--danger-color);">Error al cargar turnos</p>';
     }
 }
 
 async function reservarClase(claseId) {
     try {
         // Obtener información de la clase
-        const claseResponse = await apiRequest('clases.php?action=all', {
-            method: 'GET'
+        const claseResponse = await apiRequest("clases.php?action=all", {
+            method: "GET",
         });
 
         if (!claseResponse.success) {
-            alert('Error al cargar clase');
+            alert("Error al cargar clase");
             return;
         }
 
-        const clase = claseResponse.data.find(c => c.id == claseId);
+        const clase = claseResponse.data.find((c) => c.id == claseId);
         if (!clase) {
-            alert('Clase no encontrada');
+            alert("Clase no encontrada");
             return;
         }
 
         let socioId;
 
         // Si es recepcionista, usar el socio seleccionado
-        if (currentUser.rol === 'Recepcionista') {
-            socioId = parseInt(document.getElementById('socioSeleccionadoTurno').value);
+        if (currentUser.rol === "Recepcionista") {
+            socioId = parseInt(
+                document.getElementById("socioSeleccionadoTurno").value,
+            );
 
             if (!socioId) {
-                alert('⚠️ Debes seleccionar un socio primero');
+                alert("⚠️ Debes seleccionar un socio primero");
                 return;
             }
 
             // Verificar estado del socio
             const socioResponse = await apiRequest(`socios.php?id=${socioId}`, {
-                method: 'GET'
+                method: "GET",
             });
 
-            if (socioResponse.success && socioResponse.data.estado !== 'Activo') {
-                alert('⚠️ El socio no tiene un plan activo.\n\nNo se puede reservar turno para socios con cuota vencida.');
+            if (
+                socioResponse.success &&
+                socioResponse.data.estado !== "Activo"
+            ) {
+                alert(
+                    "⚠️ El socio no tiene un plan activo.\n\nNo se puede reservar turno para socios con cuota vencida.",
+                );
                 return;
             }
         } else {
@@ -3529,45 +3833,45 @@ async function reservarClase(claseId) {
         const fecha = getNextClassDate(clase.dia);
 
         // Reservar turno
-        const response = await apiRequest('clases.php', {
-            method: 'POST',
+        const response = await apiRequest("clases.php", {
+            method: "POST",
             body: JSON.stringify({
-                action: 'reservar',
+                action: "reservar",
                 socio_id: socioId,
                 clase_id: claseId,
-                fecha: fecha
-            })
+                fecha: fecha,
+            }),
         });
 
         if (response.success) {
-            alert('✅ ' + response.message);
+            alert("✅ " + response.message);
             updateTurnosModule();
         } else {
-            alert('❌ ' + response.message);
+            alert("❌ " + response.message);
         }
     } catch (error) {
-        console.error('Error:', error);
-        alert('❌ Error al reservar turno');
+        console.error("Error:", error);
+        alert("❌ Error al reservar turno");
     }
 }
 
 async function cancelarTurno(turnoId) {
-    if (!confirm('¿Estás seguro de cancelar este turno?')) return;
+    if (!confirm("¿Estás seguro de cancelar este turno?")) return;
 
     try {
         const response = await apiRequest(`clases.php?id=${turnoId}`, {
-            method: 'DELETE'
+            method: "DELETE",
         });
 
         if (response.success) {
-            alert('✅ ' + response.message);
+            alert("✅ " + response.message);
             updateTurnosModule();
         } else {
-            alert('❌ ' + response.message);
+            alert("❌ " + response.message);
         }
     } catch (error) {
-        console.error('Error:', error);
-        alert('❌ Error al cancelar turno');
+        console.error("Error:", error);
+        alert("❌ Error al cancelar turno");
     }
 }
 
@@ -3685,7 +3989,15 @@ function confirmarModificacionTurno(turnoId) {
 }
 
 function getNextClassDate(dia) {
-    const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    const dias = [
+        "Domingo",
+        "Lunes",
+        "Martes",
+        "Miércoles",
+        "Jueves",
+        "Viernes",
+        "Sábado",
+    ];
     const today = new Date();
     const targetDay = dias.indexOf(dia);
     const currentDay = today.getDay();
@@ -3698,7 +4010,7 @@ function getNextClassDate(dia) {
     const nextDate = new Date(today);
     nextDate.setDate(today.getDate() + daysUntilTarget);
 
-    return nextDate.toISOString().split('T')[0];
+    return nextDate.toISOString().split("T")[0];
 }
 
 // ============================================
@@ -3863,18 +4175,19 @@ function initClasesInstructoresModule() {
 }
 
 async function updateClasesTable() {
-    const tbody = document.getElementById('tablaClasesGym');
+    const tbody = document.getElementById("tablaClasesGym");
 
     try {
-        const response = await apiRequest('clases.php?action=gym', {
-            method: 'GET'
+        const response = await apiRequest("clases.php?action=gym", {
+            method: "GET",
         });
 
         if (response.success && response.data.length > 0) {
-            tbody.innerHTML = response.data.map(clase => {
-                const instructor = clase.instructor_nombre || null;
+            tbody.innerHTML = response.data
+                .map((clase) => {
+                    const instructor = clase.instructor_nombre || null;
 
-                return `
+                    return `
                     <tr>
                         <td>
                             <div>
@@ -3882,7 +4195,7 @@ async function updateClasesTable() {
                             </div>
                         </td>
                         <td>
-                            <span class="badge-tipo badge-tipo-${clase.tipo.toLowerCase().replace(/\s/g, '')}">${clase.tipo}</span>
+                            <span class="badge-tipo badge-tipo-${clase.tipo.toLowerCase().replace(/\s/g, "")}">${clase.tipo}</span>
                         </td>
                         <td>
                             <div style="display: flex; align-items: center; gap: 6px;">
@@ -3897,44 +4210,54 @@ async function updateClasesTable() {
                             </span>
                         </td>
                         <td>
-                            ${instructor ? 
-                                `<div class="instructor-assigned">
+                            ${
+                                instructor
+                                    ? `<div class="instructor-assigned">
                                     <i class="fas fa-user-check"></i>
                                     <span>${instructor}</span>
-                                </div>` : 
-                                `<span class="no-instructor">Sin asignar</span>`
+                                </div>`
+                                    : `<span class="no-instructor">Sin asignar</span>`
                             }
                         </td>
                         <td>
-                            ${currentUser.rol === 'Administrador' ? `
+                            ${
+                                currentUser.rol === "Administrador"
+                                    ? `
                                 <button class="btn-asignar-instructor" onclick="abrirModalAsignar(${clase.id})">
                                     <i class="fas fa-user-plus"></i>
-                                    ${instructor ? 'Reasignar' : 'Asignar'}
+                                    ${instructor ? "Reasignar" : "Asignar"}
                                 </button>
-                            ` : '<span style="color: var(--text-light); font-size: 13px;">-</span>'}
+                            `
+                                    : '<span style="color: var(--text-light); font-size: 13px;">-</span>'
+                            }
                         </td>
                     </tr>
                 `;
-            }).join('');
+                })
+                .join("");
         } else {
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center" style="color: var(--text-light);">No hay clases registradas</td></tr>';
+            tbody.innerHTML =
+                '<tr><td colspan="7" class="text-center" style="color: var(--text-light);">No hay clases registradas</td></tr>';
         }
     } catch (error) {
-        console.error('Error al cargar clases:', error);
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center" style="color: var(--danger-color);">Error al cargar datos</td></tr>';
+        console.error("Error al cargar clases:", error);
+        tbody.innerHTML =
+            '<tr><td colspan="7" class="text-center" style="color: var(--danger-color);">Error al cargar datos</td></tr>';
     }
 }
 
 async function updateInstructoresGrid() {
-    const grid = document.getElementById('instructoresGrid');
+    const grid = document.getElementById("instructoresGrid");
 
     try {
-        const response = await apiRequest('instructores.php?action=all', {
-            method: 'GET'
+        const response = await apiRequest("instructores.php?action=all", {
+            method: "GET",
         });
 
         if (response.success && response.data.length > 0) {
-            grid.innerHTML = response.data.map(instructor => `
+            grid.innerHTML = response.data
+                .map(
+                    (instructor) => `
                 <div class="instructor-card">
                     <div class="instructor-avatar-custom">
                         <i class="fas fa-user-tie"></i>
@@ -3956,23 +4279,27 @@ async function updateInstructoresGrid() {
                             <span class="stat-number-instructor">${instructor.clases_asignadas}</span>
                             <span class="stat-label-instructor">Clases</span>
                         </div>
-                        <div class="stat-status-instructor ${instructor.activo == 1 ? 'status-active-instructor' : 'status-inactive-instructor'}">
-                            <i class="fas fa-circle"></i> ${instructor.activo == 1 ? 'Activo' : 'Inactivo'}
+                        <div class="stat-status-instructor ${instructor.activo == 1 ? "status-active-instructor" : "status-inactive-instructor"}">
+                            <i class="fas fa-circle"></i> ${instructor.activo == 1 ? "Activo" : "Inactivo"}
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `,
+                )
+                .join("");
         } else {
-            grid.innerHTML = '<p class="text-center" style="color: var(--text-light);">No hay instructores registrados</p>';
+            grid.innerHTML =
+                '<p class="text-center" style="color: var(--text-light);">No hay instructores registrados</p>';
         }
     } catch (error) {
-        console.error('Error al cargar instructores:', error);
-        grid.innerHTML = '<p class="text-center" style="color: var(--danger-color);">Error al cargar instructores</p>';
+        console.error("Error al cargar instructores:", error);
+        grid.innerHTML =
+            '<p class="text-center" style="color: var(--danger-color);">Error al cargar instructores</p>';
     }
 }
 
 async function abrirModalAsignar(claseId) {
-    if (!tienePermiso('clases', 'asignarInstructor')) {
+    if (!tienePermiso("clases", "asignarInstructor")) {
         mostrarErrorPermisos();
         return;
     }
@@ -3981,40 +4308,47 @@ async function abrirModalAsignar(claseId) {
 
     try {
         // Cargar clase
-        const claseResponse = await apiRequest('clases.php?action=gym', {
-            method: 'GET'
+        const claseResponse = await apiRequest("clases.php?action=gym", {
+            method: "GET",
         });
 
         if (!claseResponse.success) {
-            alert('Error al cargar clase');
+            alert("Error al cargar clase");
             return;
         }
 
-        const clase = claseResponse.data.find(c => c.id == claseId);
+        const clase = claseResponse.data.find((c) => c.id == claseId);
         if (!clase) {
-            alert('Clase no encontrada');
+            alert("Clase no encontrada");
             return;
         }
 
-        document.getElementById('claseSeleccionadaNombre').textContent = clase.nombre;
-        document.getElementById('claseSeleccionadaHorario').textContent = clase.horario;
-        document.getElementById('claseSeleccionadaTipo').textContent = clase.tipo;
+        document.getElementById("claseSeleccionadaNombre").textContent =
+            clase.nombre;
+        document.getElementById("claseSeleccionadaHorario").textContent =
+            clase.horario;
+        document.getElementById("claseSeleccionadaTipo").textContent =
+            clase.tipo;
 
         // Cargar instructores
-        const instResponse = await apiRequest('instructores.php?action=all', {
-            method: 'GET'
+        const instResponse = await apiRequest("instructores.php?action=all", {
+            method: "GET",
         });
 
         if (instResponse.success) {
-            const select = document.getElementById('instructorSelect');
-            select.innerHTML = '<option value="">-- Sin instructor asignado --</option>' +
+            const select = document.getElementById("instructorSelect");
+            select.innerHTML =
+                '<option value="">-- Sin instructor asignado --</option>' +
                 instResponse.data
-                    .filter(i => i.activo == 1)
-                    .map(i => `
-                        <option value="${i.id}" ${clase.instructor_id == i.id ? 'selected' : ''}>
+                    .filter((i) => i.activo == 1)
+                    .map(
+                        (i) => `
+                        <option value="${i.id}" ${clase.instructor_id == i.id ? "selected" : ""}>
                             ${i.nombre} - ${i.especialidad}
                         </option>
-                    `).join('');
+                    `,
+                    )
+                    .join("");
 
             select.onchange = mostrarPreviewInstructor;
 
@@ -4023,34 +4357,40 @@ async function abrirModalAsignar(claseId) {
             }
         }
 
-        document.getElementById('asignarInstructorModal').style.display = 'flex';
+        document.getElementById("asignarInstructorModal").style.display =
+            "flex";
     } catch (error) {
-        console.error('Error:', error);
-        alert('Error al abrir modal de asignación');
+        console.error("Error:", error);
+        alert("Error al abrir modal de asignación");
     }
 }
 
 async function mostrarPreviewInstructor() {
-    const instructorId = parseInt(document.getElementById('instructorSelect').value);
-    const preview = document.getElementById('instructorPreview');
+    const instructorId = parseInt(
+        document.getElementById("instructorSelect").value,
+    );
+    const preview = document.getElementById("instructorPreview");
 
     if (!instructorId) {
-        preview.style.display = 'none';
+        preview.style.display = "none";
         return;
     }
 
     try {
-        const response = await apiRequest(`instructores.php?id=${instructorId}`, {
-            method: 'GET'
-        });
+        const response = await apiRequest(
+            `instructores.php?id=${instructorId}`,
+            {
+                method: "GET",
+            },
+        );
 
         if (!response.success) {
-            preview.style.display = 'none';
+            preview.style.display = "none";
             return;
         }
 
         const instructor = response.data;
-        
+
         preview.innerHTML = `
             <div class="preview-header-instructor">
                 <i class="fas fa-info-circle"></i>
@@ -4069,45 +4409,45 @@ async function mostrarPreviewInstructor() {
             </div>
         `;
 
-        preview.style.display = 'block';
+        preview.style.display = "block";
     } catch (error) {
-        console.error('Error:', error);
-        preview.style.display = 'none';
+        console.error("Error:", error);
+        preview.style.display = "none";
     }
 }
 
 async function confirmarAsignacion() {
     if (!claseSeleccionadaId) return;
 
-    const instructorId = document.getElementById('instructorSelect').value;
+    const instructorId = document.getElementById("instructorSelect").value;
 
     try {
-        const response = await apiRequest('clases.php', {
-            method: 'PUT',
+        const response = await apiRequest("clases.php", {
+            method: "PUT",
             body: JSON.stringify({
-                action: 'asignar_instructor',
+                action: "asignar_instructor",
                 clase_id: claseSeleccionadaId,
-                instructor_id: instructorId || null
-            })
+                instructor_id: instructorId || null,
+            }),
         });
 
         if (response.success) {
-            alert('✅ ' + response.message);
+            alert("✅ " + response.message);
             updateClasesTable();
             updateInstructoresGrid();
             cerrarModalAsignar();
         } else {
-            alert('❌ Error: ' + response.message);
+            alert("❌ Error: " + response.message);
         }
     } catch (error) {
-        console.error('Error:', error);
-        alert('❌ Error al asignar instructor');
+        console.error("Error:", error);
+        alert("❌ Error al asignar instructor");
     }
 }
 
 function cerrarModalAsignar() {
-    document.getElementById('asignarInstructorModal').style.display = 'none';
-    document.getElementById('instructorPreview').style.display = 'none';
+    document.getElementById("asignarInstructorModal").style.display = "none";
+    document.getElementById("instructorPreview").style.display = "none";
     claseSeleccionadaId = null;
 }
 
@@ -4117,24 +4457,27 @@ function cerrarModalAsignar() {
 async function generarTicket(pagoId) {
     try {
         const response = await apiRequest(`pagos.php?id=${pagoId}`, {
-            method: 'GET'
+            method: "GET",
         });
 
         if (!response.success) {
-            alert('❌ Error al generar el ticket: ' + (response.message || 'No se pudo obtener la información'));
+            alert(
+                "❌ Error al generar el ticket: " +
+                    (response.message || "No se pudo obtener la información"),
+            );
             return;
         }
 
         const pago = response.data;
-        
+
         // Validar que tengamos los datos necesarios
         if (!pago || !pago.id) {
-            alert('❌ Error: Datos del pago incompletos');
-            console.error('Datos del pago:', pago);
+            alert("❌ Error: Datos del pago incompletos");
+            console.error("Datos del pago:", pago);
             return;
         }
 
-        const ticketContent = document.getElementById('ticketContent');
+        const ticketContent = document.getElementById("ticketContent");
 
         ticketContent.innerHTML = `
             <div class="ticket-header">
@@ -4149,7 +4492,7 @@ async function generarTicket(pagoId) {
             <div class="ticket-body">
                 <div class="ticket-section">
                     <h3>Comprobante de Pago</h3>
-                    <p class="ticket-number">N° ${String(pago.id).padStart(6, '0')}</p>
+                    <p class="ticket-number">N° ${String(pago.id).padStart(6, "0")}</p>
                 </div>
 
                 <div class="ticket-divider"></div>
@@ -4161,7 +4504,7 @@ async function generarTicket(pagoId) {
                     </div>
                     <div class="ticket-row">
                         <span class="ticket-label">Hora:</span>
-                        <span class="ticket-value">${new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span class="ticket-value">${new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}</span>
                     </div>
                 </div>
 
@@ -4171,15 +4514,15 @@ async function generarTicket(pagoId) {
                     <h4>Datos del Socio</h4>
                     <div class="ticket-row">
                         <span class="ticket-label">Nombre:</span>
-                        <span class="ticket-value">${pago.socio_nombre || 'N/A'}</span>
+                        <span class="ticket-value">${pago.socio_nombre || "N/A"}</span>
                     </div>
                     <div class="ticket-row">
                         <span class="ticket-label">DNI:</span>
-                        <span class="ticket-value">${pago.dni || 'N/A'}</span>
+                        <span class="ticket-value">${pago.dni || "N/A"}</span>
                     </div>
                     <div class="ticket-row">
                         <span class="ticket-label">Plan:</span>
-                        <span class="ticket-value">${pago.plan || 'N/A'}</span>
+                        <span class="ticket-value">${pago.plan || "N/A"}</span>
                     </div>
                 </div>
 
@@ -4189,11 +4532,11 @@ async function generarTicket(pagoId) {
                     <h4>Detalle del Pago</h4>
                     <div class="ticket-row">
                         <span class="ticket-label">Concepto:</span>
-                        <span class="ticket-value">${pago.concepto || 'N/A'}</span>
+                        <span class="ticket-value">${pago.concepto || "N/A"}</span>
                     </div>
                     <div class="ticket-row">
                         <span class="ticket-label">Método:</span>
-                        <span class="ticket-value">${pago.metodo_pago || 'N/A'}</span>
+                        <span class="ticket-value">${pago.metodo_pago || "N/A"}</span>
                     </div>
                 </div>
 
@@ -4211,10 +4554,10 @@ async function generarTicket(pagoId) {
             </div>
         `;
 
-        document.getElementById('ticketModal').style.display = 'flex';
+        document.getElementById("ticketModal").style.display = "flex";
     } catch (error) {
-        console.error('Error al generar ticket:', error);
-        alert('❌ Error al generar el ticket: ' + error.message);
+        console.error("Error al generar ticket:", error);
+        alert("❌ Error al generar el ticket: " + error.message);
     }
 }
 
@@ -5241,51 +5584,50 @@ window.cancelarTurno = function (turnoId) {
 let planEnEdicion = null;
 
 async function editarPlan(planId) {
-    if (currentUser.rol !== 'Administrador') {
+    if (currentUser.rol !== "Administrador") {
         mostrarErrorPermisos();
         return;
     }
 
     try {
         const response = await apiRequest(`planes.php?id=${planId}`, {
-            method: 'GET'
+            method: "GET",
         });
 
         if (!response.success) {
-            alert('❌ Plan no encontrado');
+            alert("❌ Plan no encontrado");
             return;
         }
 
         const plan = response.data;
         planEnEdicion = plan;
 
-        document.getElementById('tituloModalPlan').textContent = 'Editar Plan';
-        document.getElementById('planNombre').value = plan.nombre;
-        document.getElementById('planDuracion').value = plan.duracion;
-        document.getElementById('planCosto').value = plan.costo;
-        document.getElementById('planDescripcion').value = plan.descripcion;
-        document.getElementById('planActivo').checked = plan.activo != 0;
-        document.getElementById('errorPlan').style.display = 'none';
-        document.getElementById('modalPlan').style.display = 'flex';
+        document.getElementById("tituloModalPlan").textContent = "Editar Plan";
+        document.getElementById("planNombre").value = plan.nombre;
+        document.getElementById("planDuracion").value = plan.duracion;
+        document.getElementById("planCosto").value = plan.costo;
+        document.getElementById("planDescripcion").value = plan.descripcion;
+        document.getElementById("planActivo").checked = plan.activo != 0;
+        document.getElementById("errorPlan").style.display = "none";
+        document.getElementById("modalPlan").style.display = "flex";
 
-        document.getElementById('formPlan').onsubmit = (e) => {
+        document.getElementById("formPlan").onsubmit = (e) => {
             e.preventDefault();
             guardarPlan();
         };
     } catch (error) {
-        console.error('Error al cargar plan:', error);
-        alert('❌ Error al cargar el plan');
+        console.error("Error al cargar plan:", error);
+        alert("❌ Error al cargar el plan");
     }
 }
 
-
 async function guardarPlan() {
-    const nombre = document.getElementById('planNombre').value.trim();
-    const duracion = parseInt(document.getElementById('planDuracion').value);
-    const costo = parseFloat(document.getElementById('planCosto').value);
-    const descripcion = document.getElementById('planDescripcion').value.trim();
-    const activo = document.getElementById('planActivo').checked;
-    const errorDiv = document.getElementById('errorPlan');
+    const nombre = document.getElementById("planNombre").value.trim();
+    const duracion = parseInt(document.getElementById("planDuracion").value);
+    const costo = parseFloat(document.getElementById("planCosto").value);
+    const descripcion = document.getElementById("planDescripcion").value.trim();
+    const activo = document.getElementById("planActivo").checked;
+    const errorDiv = document.getElementById("errorPlan");
 
     if (duracion < 1) {
         errorDiv.innerHTML = `
@@ -5295,7 +5637,7 @@ async function guardarPlan() {
                 <p>La duración debe ser al menos 1 día.</p>
             </div>
         `;
-        errorDiv.style.display = 'flex';
+        errorDiv.style.display = "flex";
         return;
     }
 
@@ -5307,7 +5649,7 @@ async function guardarPlan() {
                 <p>El costo no puede ser negativo.</p>
             </div>
         `;
-        errorDiv.style.display = 'flex';
+        errorDiv.style.display = "flex";
         return;
     }
 
@@ -5317,28 +5659,28 @@ async function guardarPlan() {
             duracion: duracion,
             costo: costo,
             descripcion: descripcion,
-            activo: activo ? 1 : 0
+            activo: activo ? 1 : 0,
         };
 
         let response;
-        
+
         if (planEnEdicion) {
             // Editar plan existente
             data.id = planEnEdicion.id;
-            response = await apiRequest('planes.php', {
-                method: 'PUT',
-                body: JSON.stringify(data)
+            response = await apiRequest("planes.php", {
+                method: "PUT",
+                body: JSON.stringify(data),
             });
         } else {
             // Crear nuevo plan
-            response = await apiRequest('planes.php', {
-                method: 'POST',
-                body: JSON.stringify(data)
+            response = await apiRequest("planes.php", {
+                method: "POST",
+                body: JSON.stringify(data),
             });
         }
 
         if (response.success) {
-            alert('✅ ' + response.message);
+            alert("✅ " + response.message);
             cerrarModalPlan();
             updatePlanesGrid();
         } else {
@@ -5349,44 +5691,48 @@ async function guardarPlan() {
                     <p>${response.message}</p>
                 </div>
             `;
-            errorDiv.style.display = 'flex';
+            errorDiv.style.display = "flex";
         }
     } catch (error) {
-        console.error('Error al guardar plan:', error);
-        alert('❌ Error al guardar el plan');
+        console.error("Error al guardar plan:", error);
+        alert("❌ Error al guardar el plan");
     }
 }
 
 async function eliminarPlan(planId) {
-    if (currentUser.rol !== 'Administrador') {
+    if (currentUser.rol !== "Administrador") {
         mostrarErrorPermisos();
         return;
     }
 
-    if (!confirm('¿Estás seguro de eliminar este plan?\n\nEsta acción no se puede deshacer.')) {
+    if (
+        !confirm(
+            "¿Estás seguro de eliminar este plan?\n\nEsta acción no se puede deshacer.",
+        )
+    ) {
         return;
     }
 
     try {
         const response = await apiRequest(`planes.php?id=${planId}`, {
-            method: 'DELETE'
+            method: "DELETE",
         });
 
         if (response.success) {
-            alert('✅ ' + response.message);
+            alert("✅ " + response.message);
             updatePlanesGrid();
         } else {
-            alert('❌ Error: ' + response.message);
+            alert("❌ Error: " + response.message);
         }
     } catch (error) {
-        console.error('Error al eliminar plan:', error);
-        alert('❌ Error al eliminar el plan');
+        console.error("Error al eliminar plan:", error);
+        alert("❌ Error al eliminar el plan");
     }
 }
 
 function cerrarModalPlan() {
-    document.getElementById('modalPlan').style.display = 'none';
-    document.getElementById('formPlan').reset();
+    document.getElementById("modalPlan").style.display = "none";
+    document.getElementById("formPlan").reset();
     planEnEdicion = null;
 }
 // ============================================
@@ -6366,8 +6712,27 @@ function confirmarCancelacionPlanAdmin() {
         }
     }
 }
+// ============================================
+// FUNCIÓN FALTANTE: ABRIR MODAL NUEVO PLAN
+// ============================================
+function abrirModalNuevoPlan() {
+    if (currentUser.rol !== "Administrador") {
+        mostrarErrorPermisos();
+        return;
+    }
 
+    planEnEdicion = null;
+    document.getElementById("tituloModalPlan").textContent = "Crear Nuevo Plan";
+    document.getElementById("formPlan").reset();
+    document.getElementById("planActivo").checked = true;s
+    document.getElementById("errorPlan").style.display = "none";
+    document.getElementById("modalPlan").style.display = "flex";
+
+    document.getElementById("formPlan").onsubmit = (e) => {
+        e.preventDefault();
+        guardarPlan();
+    };
+}
 console.log(
     "✅ Funciones de gestión de planes (Admin/Recep) cargadas correctamente",
 );
-
